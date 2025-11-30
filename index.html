@@ -3,328 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Academia do Saber - Jornada RPG</title>
-    <!-- CSS Puro para Tema RPG e Responsividade -->
-   <link rel='stylesheet' src='style.css'>
-    <script type="text/javascript">
-        // ===================================================================
-        // VARIÁVEIS DE ESTADO DO JOGO E AUTENTICAÇÃO
-        // ===================================================================
+    <title>RPG de Progresso de Estudos</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="login-screen">
+        <h2>📚 Login - RPG de Estudos</h2>
+        <input type="email" id="email-input" placeholder="Seu E-mail (Ex: user@estudo.com)">
+        <button id="login-button">Entrar</button>
+        <p id="login-message" class="error-message"></p>
+    </div>
+
+    <div id="main-screen" class="hidden">
+        <header>
+            <h1 id="welcome-message">Bem-vindo(a), Aventureiro(a)!</h1>
+            <button id="logout-button">Sair</button>
+        </header>
         
-        // Array global para armazenar todos os usuários (heróis) cadastrados
-        let users = [];
-        // Índice do usuário logado no array 'users'
-        let currentUserIndex = -1; 
-        
-        // Dados do Jogo (serão carregados do objeto do usuário logado)
-        let xp = 0;
-        let level = 1;
-        let tasks = [];
-        
-        const XP_PER_TASK = 50;
-        const XP_BONUS_QUIZ = 50;
-        const levelThresholds = [100, 150, 250, 400, 600, 850, 1100, 1400, 1800, 2500];
-        
-        // Dados do Mini Simulado
-        let currentQuestionIndex = -1;
-        const quizQuestions = [
-            { question: "Qual é a capital do Brasil?", options: ["Rio de Janeiro", "São Paulo", "Brasília", "Salvador"], answer: "Brasília" },
-            { question: "Em qual ano o Brasil foi descoberto?", options: ["1500", "1492", "1600", "1822"], answer: "1500" },
-            { question: "Quem escreveu 'Dom Casmurro'?", options: ["Machado de Assis", "José de Alencar", "Clarice Lispector", "Monteiro Lobato"], answer: "Machado de Assis" }
-        ];
+        <main>
+            <section id="rpg-status">
+                <h3>⭐ Seu Status</h3>
+                <div class="status-box">
+                    <p>Nível: <span id="player-level">1</span></p>
+                    <p>XP Atual: <span id="player-xp">0</span></p>
+                </div>
+                <div class="xp-bar-container">
+                    <div id="xp-bar-fill"></div>
+                </div>
+                <p class="xp-progress-text"><span id="xp-current-progress">0</span> / <span id="xp-needed">100</span> XP</p>
+            </section>
 
-        // ===================================================================
-        // PERSISTÊNCIA LOCAL (LOCAL STORAGE)
-        // ===================================================================
+            <section id="task-management">
+                <h3>📝 Gerenciar Tarefas de Estudo</h3>
+                <div class="add-task">
+                    <input type="text" id="new-task-input" placeholder="Nova tarefa (Ex: Estudar JS Avançado)">
+                    <select id="task-xp-value">
+                        <option value="20">Fácil (+20 XP)</option>
+                        <option value="50">Médio (+50 XP)</option>
+                        <option value="100">Difícil (+100 XP)</option>
+                    </select>
+                    <button id="add-task-button">Adicionar Tarefa</button>
+                </div>
 
-        const STORAGE_KEY = 'rpg_study_users';
+                <h4>Tarefas Ativas</h4>
+                <ul id="task-list">
+                    </ul>
+            </section>
+        </main>
+    </div>
 
-        /**
-         * Carrega o array de usuários do localStorage.
-         */
-        function loadUsersFromLocalStorage() {
-            try {
-                const storedUsers = localStorage.getItem(STORAGE_KEY);
-                if (storedUsers) {
-                    users = JSON.parse(storedUsers);
-                } else {
-                    users = []; // Array vazio se nada for encontrado
-                }
-            } catch (e) {
-                console.error("Erro ao carregar dados do localStorage:", e);
-                users = [];
-            }
-        }
-
-        /**
-         * Salva o array de usuários no localStorage.
-         */
-        function saveUsersToLocalStorage() {
-            try {
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(users));
-            } catch (e) {
-                console.error("Erro ao salvar dados no localStorage:", e);
-            }
-        }
-        
-        /**
-         * Salva o progresso do herói logado.
-         */
-        function saveUserData() {
-            if (currentUserIndex === -1) return;
-
-            // Atualiza o objeto do usuário logado no array 'users'
-            users[currentUserIndex].xp = xp;
-            users[currentUserIndex].level = level;
-            users[currentUserIndex].tasks = tasks;
-            
-            // Salva o array completo no localStorage
-            saveUsersToLocalStorage();
-        }
-
-        /**
-         * Carrega o progresso do herói logado nas variáveis globais.
-         */
-        function loadUserData() {
-            if (currentUserIndex === -1) return;
-            
-            const userData = users[currentUserIndex];
-            xp = userData.xp;
-            level = userData.level;
-            tasks = userData.tasks;
-            
-            document.getElementById('player-id').textContent = userData.email;
-            
-            updateProgressAnimation();
-            renderTaskList();
-            checkSkillTree();
-        }
-
-        // ===================================================================
-        // AUTENTICAÇÃO LOCAL (LOGIN/CADASTRO)
-        // ===================================================================
-
-        /**
-         * Lida com o processo de Login (Sign In).
-         */
-        function handleLogin() {
-            const email = document.getElementById('login-email').value;
-            const password = document.getElementById('login-password').value;
-            const feedback = document.getElementById('auth-feedback');
-
-            if (!email || !password) {
-                feedback.textContent = "Preencha e-mail e senha.";
-                return;
-            }
-
-            const userIndex = users.findIndex(u => u.email === email && u.password === password);
-
-            if (userIndex !== -1) {
-                currentUserIndex = userIndex;
-                feedback.textContent = "Login bem-sucedido! Iniciando Jornada...";
-                setTimeout(showMainApp, 500);
-            } else {
-                feedback.textContent = "Erro ao fazer login. E-mail ou senha incorretos.";
-            }
-        }
-        
-        /**
-         * Lida com o processo de Criação de Conta (Sign Up).
-         */
-        function handleSignUp() {
-            const email = document.getElementById('login-email').value;
-            const password = document.getElementById('login-password').value;
-            const feedback = document.getElementById('auth-feedback');
-
-            if (!email || !password || password.length < 6) {
-                feedback.textContent = "E-mail e senha (mín. 6 caracteres) são obrigatórios.";
-                return;
-            }
-
-            if (users.some(u => u.email === email)) {
-                feedback.textContent = "Este e-mail já possui um Herói cadastrado.";
-                return;
-            }
-            
-            // Cria novo Herói com dados iniciais
-            const newHero = {
-                email: email,
-                password: password,
-                xp: 0,
-                level: 1,
-                tasks: [
-                    { id: 1, name: "Concluir o Tutorial de Cadastro", completed: false, xp: XP_PER_TASK },
-                    { id: 2, name: "Revisar as Regras Místicas (Funções JS)", completed: false, xp: XP_PER_TASK }
-                ]
-            };
-
-            users.push(newHero);
-            saveUsersToLocalStorage(); // Salva o novo usuário
-
-            currentUserIndex = users.length - 1;
-            feedback.textContent = "Novo Herói criado com sucesso! Entrando no jogo...";
-            setTimeout(showMainApp, 500);
-        }
-
-        /**
-         * Mostra a tela principal do aplicativo.
-         */
-        function showMainApp() {
-            document.getElementById('login-screen').style.display = 'none';
-            document.getElementById('main-app-content').style.display = 'block';
-            loadUserData();
-        }
-
-        // ===================================================================
-        // FUNÇÕES DE PROGRESSO (XP/NÍVEL)
-        // ===================================================================
-
-        function getXPThreshold(currentLevel) {
-            if (currentLevel <= levelThresholds.length) {
-                return levelThresholds[currentLevel - 1];
-            }
-            return levelThresholds[levelThresholds.length - 1] + (currentLevel - levelThresholds.length) * 300;
-        }
-
-        function updateProgressAnimation() {
-            const nextThreshold = getXPThreshold(level);
-            let percentage;
-
-            if (level === 1) {
-                percentage = (xp / nextThreshold) * 100;
-            } else {
-                // Cálculo de XP dentro do nível atual
-                const prevThreshold = getXPThreshold(level - 1);
-                const xpGainedInLevel = xp - prevThreshold;
-                const totalXpInLevel = nextThreshold - prevThreshold;
-                percentage = (xpGainedInLevel / totalXpInLevel) * 100;
-            }
-            
-            percentage = Math.max(0, Math.min(100, percentage));
-
-            const xpBar = document.getElementById('xp-bar');
-            xpBar.style.width = `${percentage}%`;
-            xpBar.textContent = `${Math.floor(percentage)}%`;
-            
-            document.getElementById('xp-current-display').textContent = xp;
-            document.getElementById('xp-next-display').textContent = nextThreshold;
-            document.getElementById('player-level-display').textContent = `Nível ${level}`;
-            
-            checkSkillTree();
-        }
-
-        function gainXP(amount) {
-            xp += amount;
-            
-            let leveledUp = false;
-            let nextThreshold = getXPThreshold(level);
-
-            while (xp >= nextThreshold) {
-                level++;
-                leveledUp = true;
-                nextThreshold = getXPThreshold(level);
-            }
-
-            if (leveledUp) {
-                const msg = document.getElementById('level-up-message');
-                msg.textContent = `💥 NÍVEL UP! Você alcançou o Nível ${level}! 💥`;
-                msg.style.display = 'block';
-                setTimeout(() => msg.style.display = 'none', 3000);
-            }
-
-            updateProgressAnimation();
-            saveUserData(); // Salva no array e localStorage
-        }
-
-        // ===================================================================
-        // CRONOGRAMA (GESTÃO DE TAREFAS)
-        // ===================================================================
-
-        function renderTaskList() {
-            const listElement = document.getElementById('task-list');
-            listElement.innerHTML = '';
-            
-            if (tasks.length === 0) {
-                listElement.innerHTML = `<p style="opacity: 0.7; text-align: center; padding: 20px; font-size: 14px;">Nenhuma Quest ativa. Adicione uma nova Quest acima!</p>`;
-                return;
-            }
-
-            tasks.forEach(task => {
-                const item = document.createElement('div');
-                item.className = 'task-item' + (task.completed ? ' completed' : '');
-                
-                item.innerHTML = `
-                    <input type="checkbox" id="task-${task.id}" 
-                           style="width: 20px; height: 20px; cursor: pointer; accent-color: var(--highlight-green);"
-                           ${task.completed ? 'checked disabled' : ''}>
-                    <span class="task-name">${task.name}</span>
-                    <span class="xp-reward">(+${task.xp || XP_PER_TASK} XP)</span>
-                    <button class="rpg-button remove-btn" data-id="${task.id}">
-                        X
-                    </button>
-                `;
-
-                // Listener para completar a tarefa
-                if (!task.completed) {
-                    item.querySelector('input').addEventListener('change', () => {
-                        completeTask(task.id, task.xp || XP_PER_TASK);
-                    });
-                }
-                
-                // Listener para remover a tarefa
-                item.querySelector('.remove-btn').addEventListener('click', (e) => {
-                    removeTask(parseInt(e.target.getAttribute('data-id')));
-                });
-
-                listElement.appendChild(item);
-            });
-        }
-        
-        function completeTask(taskId, xpAmount) {
-            const taskIndex = tasks.findIndex(t => t.id === taskId);
-            if (taskIndex !== -1 && !tasks[taskIndex].completed) {
-                tasks[taskIndex].completed = true;
-                gainXP(xpAmount);
-                renderTaskList();
-            }
-        }
-
-        function addTaskHandler() {
-            const inputElement = document.getElementById('new-task-input');
-            const taskName = inputElement.value.trim();
-            
-            if (taskName) {
-                // IDs devem ser únicos e crescentes.
-                const newId = tasks.length > 0 ? Math.max(...tasks.map(t => t.id)) + 1 : 1;
-                tasks.push({ 
-                    id: newId, 
-                    name: taskName, 
-                    completed: false, 
-                    xp: XP_PER_TASK 
-                });
-                inputElement.value = ''; // Limpa o input
-                renderTaskList();
-                saveUserData();
-            }
-        }
-        
-        function removeTask(taskId) {
-            tasks = tasks.filter(t => t.id !== taskId);
-            renderTaskList();
-            saveUserData();
-        }
-
-        // ===================================================================
-        // MAPA MENTAL (SKILL TREE)
-        // ===================================================================
-
-        function checkSkillTree() {
-            const nodes = document.querySelectorAll('#skill-tree .skill-node');
-            nodes.forEach(node => {
-                const requiredLevel = parseInt(node.getAttribute('data-level'));
-                const skillName = node.getAttribute('data-skill');
-
-                if (level >= requiredLevel) {
-                    node.classList.remove('skill-locked');
-                    node.classList.add('skill-unlocked');
-                    node.title = `Conhecimento Desbloqueado: ${skillN
+    <script src="script.js"></script>
+</body>
+</html>
