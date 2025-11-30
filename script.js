@@ -1,30 +1,29 @@
 // --- 1. CONFIGURAÇÕES E ESTADO GLOBAL ---
 
-// Usuários aceitos (simulando um banco de dados)
+// Usuários aceitos (Simulando um banco de dados de usuários/senhas)
 const ACCEPTED_USERS = [
-    { email: "user@estudo.com", name: "Estudante Mestre" },
-    { email: "guest@rpg.com", name: "Aprendiz Curioso" },
+    { username: "mestre", password: "123", name: "Estudante Mestre" },
+    { username: "aprendiz", password: "456", name: "Aprendiz Curioso" },
 ];
 
-// Estado do jogador (dados persistentes em memória)
+// Estado do jogador
 let playerState = {
-    email: '',
+    username: '',
     name: '',
     level: 1,
     xp: 0,
     tasks: [], // { name: string, xp: number }
 };
 
-// Fórmula para XP necessário para subir de nível (aumento constante)
+// Fórmula para XP necessário para subir de nível (mais limpa)
 const XP_BASE = 100;
-const XP_LEVEL_MULTIPLIER = 1.5; // XP_Necessário = XP_BASE * (Nível ^ Multiplicador)
+const XP_LEVEL_MULTIPLIER = 2; // XP_Necessário = XP_BASE * (Nível) * 2
 
 function getXpNeeded(level) {
-    // Para manter a barra sempre aumentando, aumentamos o XP necessário por nível.
-    // Nível 1 -> 100 XP
-    // Nível 2 -> 100 * (2^1.5) ≈ 282 XP
-    // Nível 3 -> 100 * (3^1.5) ≈ 519 XP
-    return Math.floor(XP_BASE * (level ** XP_LEVEL_MULTIPLIER));
+    // Nível 1 -> 100 * 1 = 100 XP
+    // Nível 2 -> 100 * 2 = 200 XP (Total acumulado: 300)
+    // Nível 3 -> 100 * 3 = 300 XP (Total acumulado: 600)
+    return XP_BASE * level * XP_LEVEL_MULTIPLIER;
 }
 
 // --- 2. FUNÇÕES DE RENDERIZAÇÃO E ATUALIZAÇÃO ---
@@ -42,7 +41,11 @@ function updateStatus() {
         playerState.level++;       // Aumenta o nível
         currentLevel = playerState.level;
         xpNeeded = getXpNeeded(currentLevel); // Recalcula o XP necessário para o próximo nível
-        alert(`🎉 PARABÉNS! Você subiu para o Nível ${playerState.level}!`);
+        
+        // Alerta de Level Up!
+        setTimeout(() => {
+            alert(`🎉 PARABÉNS, ${playerState.name}! Você subiu para o Nível ${playerState.level}!`);
+        }, 100);
     }
 
     // Atualiza o DOM
@@ -56,12 +59,16 @@ function updateStatus() {
     xpCurrentElement.textContent = playerState.xp;
     xpNeededElement.textContent = xpNeeded;
 
-    // Calcula a porcentagem para a barra
-    const xpPercentage = (playerState.xp / xpNeeded) * 100;
-    xpBarFill.style.width = `${xpPercentage.toFixed(2)}%`;
+    // Calcula a porcentagem para a barra (usa o XP para o Nível ATUAL)
+    const previousLevelXp = playerState.level > 1 ? getXpNeeded(playerState.level - 1) : 0;
+    const currentLevelXpNeeded = xpNeeded;
+
+    // A barra sempre representa o progresso do NÍVEL ATUAL
+    const xpPercentage = (playerState.xp / currentLevelXpNeeded) * 100;
+
+    xpBarFill.style.width = `${Math.min(xpPercentage, 100).toFixed(2)}%`;
     xpCurrentProgress.textContent = playerState.xp;
     
-    // Salva o estado após cada atualização
     saveState();
 }
 
@@ -73,7 +80,7 @@ function renderTasks() {
     taskList.innerHTML = ''; // Limpa a lista existente
 
     if (playerState.tasks.length === 0) {
-        taskList.innerHTML = '<li style="text-align: center; color: #777;">Você não tem tarefas ativas. Adicione uma!</li>';
+        taskList.innerHTML = '<li style="text-align: center; color: #777; font-style: italic;">Sua lista de missões está vazia. Adicione uma nova jornada!</li>';
         return;
     }
 
@@ -85,8 +92,8 @@ function renderTasks() {
                 <span class="task-xp">+${task.xp} XP</span>
             </div>
             <div class="task-actions">
-                <button class="complete-btn" data-index="${index}">Concluir</button>
-                <button class="remove-btn" data-index="${index}">Remover</button>
+                <button class="complete-btn primary-btn" data-index="${index}">Concluir</button>
+                <button class="remove-btn danger-btn" data-index="${index}">Remover</button>
             </div>
         `;
         taskList.appendChild(li);
@@ -101,18 +108,24 @@ function renderTasks() {
 function addTask() {
     const input = document.getElementById('new-task-input');
     const xpSelect = document.getElementById('task-xp-value');
-    
+
     const taskName = input.value.trim();
     const taskXp = parseInt(xpSelect.value, 10);
 
     if (taskName === "") {
-        alert("Por favor, insira o nome da tarefa.");
+        alert("Por favor, insira o nome da Missão.");
+        return;
+    }
+    
+    // Limita o número de tarefas para evitar sobrecarga (UX)
+    if (playerState.tasks.length >= 10) {
+        alert("Você atingiu o limite de 10 Missões Ativas. Conclua algumas!");
         return;
     }
 
     playerState.tasks.push({ name: taskName, xp: taskXp });
     input.value = ''; // Limpa o input
-    
+
     renderTasks();
     saveState();
 }
@@ -125,20 +138,25 @@ function addTask() {
 function handleTaskAction(index, isCompletion) {
     if (index >= 0 && index < playerState.tasks.length) {
         const task = playerState.tasks[index];
-        
+
         // Remove a tarefa da array
         playerState.tasks.splice(index, 1);
-        
+
         if (isCompletion) {
             playerState.xp += task.xp; // Adiciona XP
             updateStatus(); // Atualiza XP e nível
-            alert(`✅ Tarefa "${task.name}" concluída! Você ganhou ${task.xp} XP!`);
+            
+            // Feedback mais detalhado
+            document.getElementById('welcome-message').textContent = `+${task.xp} XP! ${playerState.name}!`;
+            setTimeout(() => {
+                 document.getElementById('welcome-message').textContent = `Bem-vindo(a), ${playerState.name}!`;
+            }, 1500);
+
         } else {
-            alert(`❌ Tarefa "${task.name}" removida sem XP.`);
+            // Apenas remove
         }
-        
+
         renderTasks();
-        saveState();
     }
 }
 
@@ -148,42 +166,43 @@ function handleTaskAction(index, isCompletion) {
  * Salva o estado atual do jogador no Local Storage do navegador.
  */
 function saveState() {
-    if (playerState.email) {
-        localStorage.setItem(`rpg_study_state_${playerState.email}`, JSON.stringify(playerState));
+    if (playerState.username) {
+        // Usa o username para chavear o Local Storage
+        localStorage.setItem(`rpg_study_state_${playerState.username}`, JSON.stringify(playerState));
     }
 }
 
 /**
  * Carrega o estado do jogador salvo ou inicia um novo.
- * @param {string} email - O email do usuário logado.
+ * @param {string} username - O nome de usuário logado.
  */
-function loadState(email) {
-    const savedState = localStorage.getItem(`rpg_study_state_${email}`);
-    
+function loadState(username) {
+    const savedState = localStorage.getItem(`rpg_study_state_${username}`);
+
     // Busca os dados de nome na lista de usuários aceitos
-    const user = ACCEPTED_USERS.find(u => u.email === email);
-    
+    const user = ACCEPTED_USERS.find(u => u.username === username);
+
     if (savedState) {
         // Carrega o estado existente
         playerState = JSON.parse(savedState);
     } else {
         // Inicia um novo estado
         playerState = {
-            email: email,
+            username: username,
             name: user.name,
             level: 1,
             xp: 0,
             tasks: [],
         };
     }
-    
-    // Garante que o nome e email estejam corretos, mesmo se o estado for antigo
-    playerState.email = email;
+
+    // Garante que o nome e username estejam corretos
+    playerState.username = username;
     playerState.name = user.name;
-    
+
     // Atualiza o cabeçalho e as interfaces
     document.getElementById('welcome-message').textContent = `Bem-vindo(a), ${playerState.name}!`;
-    updateStatus();
+    updateStatus(); // Garante que o XP/Nível inicial estejam corretos
     renderTasks();
 }
 
@@ -191,36 +210,40 @@ function loadState(email) {
  * Gerencia o processo de login.
  */
 function handleLogin() {
-    const emailInput = document.getElementById('email-input');
+    const usernameInput = document.getElementById('username-input');
+    const passwordInput = document.getElementById('password-input');
     const messageElement = document.getElementById('login-message');
-    const email = emailInput.value.trim().toLowerCase();
+    
+    const username = usernameInput.value.trim().toLowerCase();
+    const password = passwordInput.value;
 
-    // 1. Validação simples de formato de e-mail (basta ter @)
-    if (!email || !email.includes('@')) {
-        messageElement.textContent = "Por favor, insira um e-mail válido.";
+    if (!username || !password) {
+        messageElement.textContent = "Por favor, preencha o Nome de Usuário e a Senha.";
         return;
     }
-    
-    // 2. Verifica se o e-mail está na lista de usuários aceitos
-    const userFound = ACCEPTED_USERS.find(user => user.email === email);
+
+    // 2. Verifica as credenciais
+    const userFound = ACCEPTED_USERS.find(user => 
+        user.username.toLowerCase() === username && user.password === password
+    );
 
     if (userFound) {
         // Login bem-sucedido
         messageElement.textContent = "";
-        
-        // Esconde o login e mostra a tela principal
+
+        // Transição da tela
         document.getElementById('login-screen').classList.add('hidden');
         document.getElementById('main-screen').classList.remove('hidden');
 
         // Carrega os dados do jogador
-        loadState(email);
-        
-        // Salva o email na sessão para manter o estado (simples)
-        sessionStorage.setItem('current_user_email', email);
+        loadState(username);
+
+        // Salva o username na sessão
+        sessionStorage.setItem('current_username', username);
 
     } else {
-        // E-mail não encontrado
-        messageElement.textContent = `Usuário não cadastrado. E-mails válidos: ${ACCEPTED_USERS.map(u => u.email).join(', ')}.`;
+        // Credenciais inválidas
+        messageElement.textContent = `Credenciais inválidas. Tente 'mestre/123' ou 'aprendiz/456'.`;
     }
 }
 
@@ -229,17 +252,18 @@ function handleLogin() {
  */
 function handleLogout() {
     // Limpa o estado da sessão
-    sessionStorage.removeItem('current_user_email');
-    
-    // Reseta o estado do jogador em memória (não afeta o Local Storage)
-    playerState = { email: '', name: '', level: 1, xp: 0, tasks: [] };
-    
-    // Esconde a tela principal e mostra o login
+    sessionStorage.removeItem('current_username');
+
+    // Reseta o estado do jogador em memória
+    playerState = { username: '', name: '', level: 1, xp: 0, tasks: [] };
+
+    // Transição da tela
     document.getElementById('main-screen').classList.add('hidden');
     document.getElementById('login-screen').classList.remove('hidden');
-    
-    // Limpa o input do login
-    document.getElementById('email-input').value = '';
+
+    // Limpa inputs
+    document.getElementById('username-input').value = '';
+    document.getElementById('password-input').value = '';
     document.getElementById('login-message').textContent = "";
 }
 
@@ -253,18 +277,36 @@ function setupEventListeners() {
     document.getElementById('login-button').addEventListener('click', handleLogin);
     document.getElementById('logout-button').addEventListener('click', handleLogout);
 
+    // Permitir login com 'Enter'
+    document.getElementById('password-input').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            handleLogin();
+        }
+    });
+
     // Adicionar Tarefa
     document.getElementById('add-task-button').addEventListener('click', addTask);
     
+    // Adicionar tarefa com 'Enter'
+     document.getElementById('new-task-input').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            addTask();
+        }
+    });
+
+
     // Gerenciar Tarefas (Usa delegação de eventos na lista)
     document.getElementById('task-list').addEventListener('click', (event) => {
         const target = event.target;
         const index = parseInt(target.dataset.index, 10);
-        
+
         if (target.classList.contains('complete-btn')) {
             handleTaskAction(index, true); // Concluir tarefa (com XP)
         } else if (target.classList.contains('remove-btn')) {
-            handleTaskAction(index, false); // Remover tarefa (sem XP)
+            // Pergunta de confirmação para remover sem XP
+            if(confirm(`Tem certeza que deseja remover a missão "${playerState.tasks[index].name}" sem ganhar XP?`)) {
+                 handleTaskAction(index, false); // Remover tarefa (sem XP)
+            }
         }
     });
 }
@@ -274,22 +316,21 @@ function setupEventListeners() {
  */
 function init() {
     setupEventListeners();
-    
-    const currentUserEmail = sessionStorage.getItem('current_user_email');
-    
-    if (currentUserEmail) {
-        // Se houver um e-mail na sessão, carrega o estado e pula o login
-        const userFound = ACCEPTED_USERS.find(user => user.email === currentUserEmail);
+
+    const currentUsername = sessionStorage.getItem('current_username');
+
+    if (currentUsername) {
+        // Se houver um username na sessão, carrega o estado e pula o login
+        const userFound = ACCEPTED_USERS.find(user => user.username.toLowerCase() === currentUsername);
         if (userFound) {
             document.getElementById('login-screen').classList.add('hidden');
             document.getElementById('main-screen').classList.remove('hidden');
-            loadState(currentUserEmail);
+            loadState(currentUsername);
         } else {
-            // Se o e-mail não estiver mais na lista (remoção), força o logout
-            sessionStorage.removeItem('current_user_email');
+            // Se o usuário não existir, força o logout (limpeza)
+            sessionStorage.removeItem('current_username');
         }
     }
-    // Se não houver e-mail, a tela de login já é exibida por padrão no HTML/CSS
 }
 
 // Inicia a aplicação
