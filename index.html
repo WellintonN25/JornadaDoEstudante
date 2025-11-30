@@ -3,27 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RPG de Progresso de Estudos</title>
+    <title>RPG de Progresso de Estudos - Nível Up!</title>
+    <style>@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');</style>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <div id="login-screen">
-        <h2>📚 Login - RPG de Estudos</h2>
-        <input type="email" id="email-input" placeholder="Seu E-mail (Ex: user@estudo.com)">
-        <button id="login-button">Entrar</button>
+        <h2>⚔️ Acesso de Aventureiro</h2>
+        <input type="text" id="username-input" placeholder="Nome de Usuário (Ex: EstudanteMestre)">
+        <input type="password" id="password-input" placeholder="Senha Secreta">
+        <button id="login-button" class="primary-btn">Entrar na Jornada</button>
         <p id="login-message" class="error-message"></p>
     </div>
 
     <div id="main-screen" class="hidden">
         <header>
             <h1 id="welcome-message">Bem-vindo(a), Aventureiro(a)!</h1>
-            <button id="logout-button">Sair</button>
+            <button id="logout-button" class="danger-btn">Sair</button>
         </header>
-        
+
         <main>
             <section id="rpg-status">
-                <h3>⭐ Seu Status</h3>
+                <h3>✨ Seu Status de Herói</h3>
                 <div class="status-box">
                     <p>Nível: <span id="player-level">1</span></p>
                     <p>XP Atual: <span id="player-xp">0</span></p>
@@ -31,19 +33,19 @@
                 <div class="xp-bar-container">
                     <div id="xp-bar-fill"></div>
                 </div>
-                <p class="xp-progress-text"><span id="xp-current-progress">0</span> / <span id="xp-needed">100</span> XP</p>
+                <p class="xp-progress-text">Progresso: <span id="xp-current-progress">0</span> / <span id="xp-needed">100</span> XP</p>
             </section>
 
             <section id="task-management">
-                <h3>📝 Gerenciar Tarefas de Estudo</h3>
+                <h3>📜 Missões de Estudo (Tarefas)</h3>
                 <div class="add-task">
-                    <input type="text" id="new-task-input" placeholder="Nova tarefa (Ex: Estudar JS Avançado)">
+                    <input type="text" id="new-task-input" placeholder="Nova Missão (Ex: Revisar Algoritmos)">
                     <select id="task-xp-value">
-                        <option value="20">Fácil (+20 XP)</option>
-                        <option value="50">Médio (+50 XP)</option>
-                        <option value="100">Difícil (+100 XP)</option>
+                        <option value="20">Jornada Curta (+20 XP)</option>
+                        <option value="50">Desafio Médio (+50 XP)</option>
+                        <option value="100">Batalha Épica (+100 XP)</option>
                     </select>
-                    <button id="add-task-button">Adicionar Tarefa</button>
+                    <button id="add-task-button" class="primary-btn">Adicionar Missão</button>
                 </div>
 
                 <h4>Tarefas Ativas</h4>
