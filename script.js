@@ -4,6 +4,8 @@
 const ACCEPTED_USERS = [
     { username: "mestre", password: "123", name: "Estudante Mestre" },
     { username: "aprendiz", password: "456", name: "Aprendiz Curioso" },
+    { username: "Wellinton", password: "0000", name: "Wellinton" },
+    { username: "Yasmin", password: "123", name: "Yasmin" },
 ];
 
 // Estado do jogador
