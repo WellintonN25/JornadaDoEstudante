@@ -1,14 +1,18 @@
 :root {
-    --primary-color: #4CAF50; /* Verde RPG */
-    --secondary-color: #388E3C;
-    --background-color: #f4f4f4;
-    --text-color: #333;
-    --bar-color: #2196F3; /* Azul XP */
-    --bar-bg: #ccc;
+    /* Cores Elegantes e Modernas */
+    --primary-color: #FF8C42; /* Laranja Suave/Terracota */
+    --secondary-color: #E84855; /* Um toque de Vermelho/Rosa */
+    --accent-color: #17A2B8; /* Azul para destaque de XP */
+    --background-color: #f8f9fa; /* Fundo Levemente Cinza */
+    --card-background: #ffffff;
+    --text-color: #343a40; /* Cinza Escuro */
+    --shadow-light: 0 4px 12px rgba(0, 0, 0, 0.08);
+    --shadow-hover: 0 6px 16px rgba(0, 0, 0, 0.12);
 }
 
+/* Base Global */
 body {
-    font-family: 'Arial', sans-serif;
+    font-family: 'Poppins', sans-serif; /* Fonte moderna (simulada) */
     margin: 0;
     padding: 0;
     background-color: var(--background-color);
@@ -17,49 +21,81 @@ body {
     justify-content: center;
     align-items: center;
     min-height: 100vh;
+    transition: background-color 0.3s;
 }
 
-/* Esconder elementos */
+h1, h2, h3 {
+    color: var(--secondary-color);
+    margin-top: 0;
+    font-weight: 600;
+}
+
 .hidden {
     display: none !important;
 }
 
-/* --- Tela de Login --- */
-#login-screen {
-    background: #fff;
-    padding: 40px;
-    border-radius: 10px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    text-align: center;
-    width: 300px;
-}
-
-#email-input, #login-button {
+/* Elementos de Input e Botão Base */
+input[type="text"],
+input[type="password"],
+select {
     width: 100%;
-    padding: 10px;
+    padding: 12px;
     margin-bottom: 15px;
-    border-radius: 5px;
+    border: 1px solid #ced4da;
+    border-radius: 8px;
+    box-sizing: border-box;
+    transition: border-color 0.3s, box-shadow 0.3s;
 }
 
-#email-input {
-    border: 1px solid #ddd;
+input:focus, select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(255, 140, 66, 0.25);
+    outline: none;
 }
 
-#login-button {
+button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.3s, transform 0.1s;
+}
+
+button:hover {
+    transform: translateY(-1px);
+}
+
+.primary-btn {
     background-color: var(--primary-color);
     color: white;
-    border: none;
-    cursor: pointer;
-    font-weight: bold;
-    transition: background-color 0.3s;
 }
 
-#login-button:hover {
+.primary-btn:hover {
+    background-color: #e57e3c;
+}
+
+.danger-btn {
     background-color: var(--secondary-color);
+    color: white;
+}
+
+.danger-btn:hover {
+    background-color: #d13e4b;
+}
+
+/* --- Tela de Login --- */
+#login-screen {
+    background: var(--card-background);
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: var(--shadow-light);
+    text-align: center;
+    width: 350px;
 }
 
 .error-message {
-    color: red;
+    color: var(--secondary-color);
     font-size: 0.9em;
     margin-top: 10px;
 }
@@ -67,110 +103,87 @@ body {
 /* --- Tela Principal --- */
 #main-screen {
     width: 90%;
-    max-width: 800px;
-    background: #fff;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    max-width: 900px;
+    background: var(--card-background);
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: var(--shadow-light);
 }
 
 header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 2px solid #eee;
-    padding-bottom: 10px;
-    margin-bottom: 20px;
+    border-bottom: 3px solid var(--primary-color); /* Linha divisória de destaque */
+    padding-bottom: 15px;
+    margin-bottom: 30px;
 }
 
-#logout-button {
-    background-color: #f44336;
-    color: white;
-    border: none;
-    padding: 8px 15px;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-/* Painel de Status */
+/* Cartão de Status */
 #rpg-status {
     margin-bottom: 30px;
-    padding: 15px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 10px;
+    background-color: #f4f6f9; /* Fundo mais suave para a seção */
+    border-left: 5px solid var(--accent-color);
+}
+
+.status-box {
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 0;
 }
 
 .status-box p {
-    font-size: 1.1em;
-    font-weight: bold;
+    font-size: 1.2em;
+    font-weight: 700;
     margin: 5px 0;
 }
 
-/* Barra de XP (O Coração do RPG) */
+.status-box span {
+    color: var(--accent-color);
+}
+
+/* Barra de XP (Estilo mais limpo) */
 .xp-bar-container {
-    height: 25px;
-    background-color: var(--bar-bg);
-    border-radius: 12px;
+    height: 18px;
+    background-color: #e9ecef;
+    border-radius: 9px;
     overflow: hidden;
     margin: 10px 0;
-    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 #xp-bar-fill {
     height: 100%;
-    width: 0%; /* Controlado pelo JS */
-    background-color: var(--bar-color);
+    width: 0%;
+    background-color: var(--accent-color);
     transition: width 0.5s ease-out;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-weight: bold;
-    font-size: 0.9em;
-    background-image: linear-gradient(
-        to right, 
-        rgba(255, 255, 255, 0.3) 0, 
-        rgba(255, 255, 255, 0.3) 25%, 
-        transparent 25%, 
-        transparent 50%, 
-        rgba(255, 255, 255, 0.3) 50%, 
-        rgba(255, 255, 255, 0.3) 75%, 
-        transparent 75%, 
-        transparent 100%
-    ); /* Efeito visual de barra de energia */
-    background-size: 20px 20px;
+    border-radius: 9px 0 0 9px;
 }
 
 .xp-progress-text {
     text-align: right;
     font-size: 0.9em;
+    font-weight: 500;
+    color: #6c757d;
 }
 
 /* Gerenciamento de Tarefas */
 .add-task {
     display: flex;
     gap: 10px;
-    margin-bottom: 20px;
+    margin-bottom: 25px;
+    padding: 15px;
+    background-color: #f4f6f9;
+    border-radius: 8px;
 }
 
 .add-task input, .add-task select {
-    padding: 8px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
+    margin-bottom: 0;
 }
 
 .add-task input {
     flex-grow: 1;
-}
-
-#add-task-button {
-    background-color: var(--secondary-color);
-    color: white;
-    border: none;
-    padding: 8px 15px;
-    border-radius: 5px;
-    cursor: pointer;
 }
 
 #task-list {
@@ -182,44 +195,36 @@ header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px;
-    margin-bottom: 8px;
-    background-color: #fff;
-    border: 1px solid #eee;
-    border-radius: 5px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    padding: 15px;
+    margin-bottom: 10px;
+    background-color: var(--card-background);
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    box-shadow: var(--shadow-light);
+    transition: box-shadow 0.3s;
+}
+
+#task-list li:hover {
+    box-shadow: var(--shadow-hover);
 }
 
 .task-info {
     display: flex;
-    gap: 10px;
+    gap: 15px;
     align-items: center;
+    font-weight: 500;
 }
 
 .task-xp {
-    background-color: gold;
-    color: #333;
-    padding: 4px 8px;
-    border-radius: 3px;
-    font-size: 0.8em;
-    font-weight: bold;
+    background-color: var(--primary-color);
+    color: white;
+    padding: 4px 10px;
+    border-radius: 5px;
+    font-size: 0.85em;
+    font-weight: 700;
 }
 
 .task-actions button {
-    margin-left: 10px;
-    padding: 6px 10px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: bold;
-}
-
-.complete-btn {
-    background-color: var(--primary-color);
-    color: white;
-}
-
-.remove-btn {
-    background-color: #f44336;
-    color: white;
+    margin-left: 8px;
+    padding: 8px 12px;
 }
