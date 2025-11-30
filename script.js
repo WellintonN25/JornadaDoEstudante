@@ -8,22 +8,25 @@ const ACCEPTED_USERS = [
     { username: "yasmin", password: "123", name: "Yasmin" },
 ];
 
-// Estado do jogador (AGORA INCLUI completedTasks)
-let playerState = {
-    username: '',
-    name: '',
+// Modelo de estado do jogador (Usado para inicialização e migração)
+const BASE_PLAYER_STATE = {
     level: 1,
     xp: 0,
-    tasks: [], // { name: string, xp: number }
-    completedTasks: [], // { name: string, xp: number, date: string }
+    tasks: [],
+    completedTasks: [], // Garantir que essa chave sempre exista
 };
 
-// Fórmula para XP necessário para subir de nível (Melhoria sugerida - Crescimento Exponencial)
+// Estado do jogador (dados em memória)
+let playerState = { ...BASE_PLAYER_STATE };
+playerState.username = '';
+playerState.name = '';
+
+
+// Fórmula para XP necessário para subir de nível (Crescimento Exponencial)
 const XP_BASE = 100;
 const XP_LEVEL_POWER = 1.5; 
 
 function getXpNeeded(level) {
-    // XP_Necessário = 100 * (Nível ^ 1.5)
     return Math.floor(XP_BASE * (level ** XP_LEVEL_POWER));
 }
 
@@ -37,36 +40,33 @@ function updateStatus() {
     let xpNeeded = getXpNeeded(currentLevel);
 
     // Lógica para subir de nível (Level Up)
+    let leveledUp = false;
     while (playerState.xp >= xpNeeded) {
-        playerState.xp -= xpNeeded; // Subtrai o XP necessário
-        playerState.level++;       // Aumenta o nível
+        playerState.xp -= xpNeeded; 
+        playerState.level++;      
         currentLevel = playerState.level;
-        xpNeeded = getXpNeeded(currentLevel); // Recalcula o XP necessário para o próximo nível
+        xpNeeded = getXpNeeded(currentLevel); 
+        leveledUp = true;
+    }
 
-        // Alerta de Level Up!
+    if (leveledUp) {
         setTimeout(() => {
             alert(`⭐ PARABÉNS, ${playerState.name}! Você subiu para o Nível ${playerState.level}!`);
         }, 100);
     }
 
     // Atualiza o DOM
-    const levelElement = document.getElementById('player-level');
-    const xpCurrentElement = document.getElementById('player-xp');
-    const xpBarFill = document.getElementById('xp-bar-fill');
-    const xpCurrentProgress = document.getElementById('xp-current-progress');
-    const xpNeededElement = document.getElementById('xp-needed');
-
-    levelElement.textContent = playerState.level;
-    xpCurrentElement.textContent = playerState.xp;
-    xpNeededElement.textContent = xpNeeded;
-
-    // Calcula a porcentagem para a barra
+    document.getElementById('player-level').textContent = playerState.level;
+    document.getElementById('player-xp').textContent = playerState.xp;
+    document.getElementById('xp-needed').textContent = xpNeeded;
+    
     const xpPercentage = (playerState.xp / xpNeeded) * 100;
-
+    const xpBarFill = document.getElementById('xp-bar-fill');
+    
     xpBarFill.style.width = `${Math.min(xpPercentage, 100).toFixed(2)}%`;
-    xpCurrentProgress.textContent = playerState.xp;
+    document.getElementById('xp-current-progress').textContent = playerState.xp;
 
-    saveState();
+    saveState(); // Garante que o status seja salvo após LEVEL UP ou XP change
 }
 
 /**
@@ -74,7 +74,7 @@ function updateStatus() {
  */
 function renderTasks() {
     const taskList = document.getElementById('task-list');
-    taskList.innerHTML = ''; // Limpa a lista existente
+    taskList.innerHTML = ''; 
 
     if (playerState.tasks.length === 0) {
         taskList.innerHTML = '<li class="empty-list">Sua lista de missões está vazia. Adicione uma nova jornada!</li>';
@@ -109,7 +109,7 @@ function renderCompletedTasks() {
         return;
     }
 
-    // Mostra as 5 tarefas mais recentes
+    // Mostra as 5 tarefas mais recentes, por isso usamos slice(-5) e reverse()
     const recentTasks = playerState.completedTasks.slice(-5).reverse();
 
     recentTasks.forEach(task => {
@@ -154,7 +154,7 @@ function addTask() {
     input.value = '';
 
     renderTasks();
-    saveState();
+    saveState(); // Salva após adicionar nova tarefa
 }
 
 /**
@@ -164,34 +164,32 @@ function handleTaskAction(index, isCompletion) {
     if (index >= 0 && index < playerState.tasks.length) {
         const task = playerState.tasks[index];
 
-        // Remove a tarefa da array
         playerState.tasks.splice(index, 1);
 
         if (isCompletion) {
-            playerState.xp += task.xp; // Adiciona XP
+            playerState.xp += task.xp; 
             
-            // Adiciona ao histórico de missões concluídas
             playerState.completedTasks.push({
                 name: task.name,
                 xp: task.xp,
                 date: new Date().toLocaleDateString('pt-BR')
             });
 
-            updateStatus(); // Atualiza XP e nível
-            renderCompletedTasks(); // Atualiza o histórico
-
             // Feedback dinâmico no cabeçalho
             document.getElementById('welcome-message').textContent = `+${task.xp} XP! Missão Concluída!`;
             setTimeout(() => {
                  document.getElementById('welcome-message').textContent = `Bem-vindo(a), ${playerState.name}!`;
             }, 1500);
+            
+            updateStatus(); // Chama updateStatus, que também chama saveState
+            renderCompletedTasks(); 
 
         } else {
-            // Apenas remove
+            // Se apenas remover, precisamos salvar o estado da lista de tasks
+            saveState();
         }
 
         renderTasks();
-        saveState();
     }
 }
 
@@ -213,39 +211,55 @@ function saveState() {
 function loadState(username) {
     const user = ACCEPTED_USERS.find(u => u.username.toLowerCase() === username.toLowerCase());
     
-    // CORREÇÃO: Usar a chave de localStorage diretamente
-    const savedState = localStorage.getItem(`rpg_study_state_${username}`);
+    // CORREÇÃO CRÍTICA: Buscar o estado salvo
+    const savedStateJSON = localStorage.getItem(`rpg_study_state_${username}`);
     
-    if (savedState) {
-        // Carrega o estado existente (garantindo o progresso individual)
-        playerState = JSON.parse(savedState);
-    } else {
-        // Inicia um novo estado se não houver progresso salvo
-        playerState = {
-            username: username,
-            name: user.name,
-            level: 1,
-            xp: 0,
-            tasks: [],
-            completedTasks: [],
-        };
+    let loadedState = null;
+
+    if (savedStateJSON) {
+        try {
+            loadedState = JSON.parse(savedStateJSON);
+        } catch (e) {
+            console.error("Erro ao carregar estado salvo. Iniciando novo estado.", e);
+            // Se o JSON estiver corrompido, carregamos nulo.
+        }
     }
+    
+    // Inicialização do estado base
+    const initialState = { 
+        ...BASE_PLAYER_STATE, 
+        username: username,
+        name: user.name,
+    };
 
-    // Garante que o nome e username estejam corretos, caso o objeto salvo seja antigo
-    playerState.username = username;
-    playerState.name = user.name;
-
+    if (loadedState) {
+        // CORREÇÃO CRÍTICA: Mesclar o estado salvo com o estado base 
+        // Isso garante que novas propriedades (como completedTasks) existam,
+        // mesmo que o estado salvo seja antigo.
+        playerState = {
+            ...initialState,
+            ...loadedState,
+            // Sobrescreve nome e username caso os dados do ACCEPTED_USERS tenham mudado
+            username: username, 
+            name: user.name,
+        };
+    } else {
+        // Inicia novo estado
+        playerState = initialState;
+    }
+    
     // Atualiza a interface
     document.getElementById('welcome-message').textContent = `Bem-vindo(a), ${playerState.name}!`;
     updateStatus(); 
     renderTasks();
-    renderCompletedTasks(); // Renderiza o histórico ao carregar
+    renderCompletedTasks(); 
 }
 
 /**
  * Gerencia o processo de login.
  */
 function handleLogin() {
+    // ... (restante da função handleLogin permanece inalterado) ...
     const usernameInput = document.getElementById('username-input');
     const passwordInput = document.getElementById('password-input');
     const messageElement = document.getElementById('login-message');
@@ -265,7 +279,6 @@ function handleLogin() {
     if (userFound) {
         messageElement.textContent = "";
 
-        // Efeito de transição de login
         document.getElementById('login-screen').classList.add('fade-out');
         setTimeout(() => {
             document.getElementById('login-screen').classList.add('hidden');
@@ -281,13 +294,14 @@ function handleLogin() {
     }
 }
 
+
 /**
  * Gerencia o processo de logout.
  */
 function handleLogout() {
+    // ... (restante da função handleLogout permanece inalterado) ...
     sessionStorage.removeItem('current_username');
 
-    // Transição da tela
     document.getElementById('main-screen').classList.add('hidden');
     document.getElementById('login-screen').classList.remove('hidden');
 
@@ -325,8 +339,11 @@ function setupEventListeners() {
         if (target.classList.contains('complete-btn')) {
             handleTaskAction(index, true); 
         } else if (target.classList.contains('remove-btn')) {
-            if(confirm(`Tem certeza que deseja remover a missão "${playerState.tasks[index].name}" sem ganhar XP?`)) {
-                 handleTaskAction(index, false);
+            // Verifica se o índice é válido antes de tentar acessar a tarefa
+            if (index >= 0 && index < playerState.tasks.length) {
+                if(confirm(`Tem certeza que deseja remover a missão "${playerState.tasks[index].name}" sem ganhar XP?`)) {
+                    handleTaskAction(index, false);
+                }
             }
         }
     });
