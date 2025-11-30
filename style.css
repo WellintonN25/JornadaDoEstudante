@@ -1,18 +1,18 @@
 :root {
-    /* Cores Elegantes e Modernas */
-    --primary-color: #FF8C42; /* Laranja Suave/Terracota */
-    --secondary-color: #E84855; /* Um toque de Vermelho/Rosa */
-    --accent-color: #17A2B8; /* Azul para destaque de XP */
-    --background-color: #f8f9fa; /* Fundo Levemente Cinza */
+    --primary-color: #007bff; /* Azul vibrante (Moderno) */
+    --secondary-color: #28a745; /* Verde Sucesso */
+    --accent-color: #ffc107; /* Amarelo/Ouro para XP */
+    --danger-color: #dc3545; /* Vermelho perigo/remoção */
+    --background-color: #f0f2f5; /* Fundo muito leve */
     --card-background: #ffffff;
-    --text-color: #343a40; /* Cinza Escuro */
+    --text-color: #343a40;
     --shadow-light: 0 4px 12px rgba(0, 0, 0, 0.08);
-    --shadow-hover: 0 6px 16px rgba(0, 0, 0, 0.12);
+    --shadow-hover: 0 8px 20px rgba(0, 0, 0, 0.15);
 }
 
 /* Base Global */
 body {
-    font-family: 'Poppins', sans-serif; /* Fonte moderna (simulada) */
+    font-family: 'Poppins', sans-serif;
     margin: 0;
     padding: 0;
     background-color: var(--background-color);
@@ -21,17 +21,23 @@ body {
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    transition: background-color 0.3s;
 }
 
 h1, h2, h3 {
-    color: var(--secondary-color);
+    color: var(--primary-color);
     margin-top: 0;
-    font-weight: 600;
+    font-weight: 700;
 }
 
 .hidden {
     display: none !important;
+}
+
+/* --- Transições --- */
+#login-screen.fade-out {
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: opacity 0.5s ease-out, transform 0.5s ease-out;
 }
 
 /* Elementos de Input e Botão Base */
@@ -44,12 +50,11 @@ select {
     border: 1px solid #ced4da;
     border-radius: 8px;
     box-sizing: border-box;
-    transition: border-color 0.3s, box-shadow 0.3s;
 }
 
 input:focus, select:focus {
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 0.2rem rgba(255, 140, 66, 0.25);
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
     outline: none;
 }
 
@@ -63,7 +68,8 @@ button {
 }
 
 button:hover {
-    transform: translateY(-1px);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .primary-btn {
@@ -72,30 +78,54 @@ button:hover {
 }
 
 .primary-btn:hover {
-    background-color: #e57e3c;
+    background-color: #0056b3;
 }
 
 .danger-btn {
-    background-color: var(--secondary-color);
+    background-color: var(--danger-color);
     color: white;
+    font-size: 0.9em;
 }
 
 .danger-btn:hover {
-    background-color: #d13e4b;
+    background-color: #bd2130;
 }
 
-/* --- Tela de Login --- */
+/* --- Tela de Login Personalizada --- */
 #login-screen {
+    width: 380px;
+    perspective: 1000px;
+}
+
+.login-card {
     background: var(--card-background);
     padding: 40px;
-    border-radius: 12px;
-    box-shadow: var(--shadow-light);
+    border-radius: 15px;
+    box-shadow: var(--shadow-hover);
     text-align: center;
-    width: 350px;
+    transition: transform 0.6s;
+    /* Efeito sutil de flutuação */
+    animation: float 4s ease-in-out infinite;
+}
+
+.login-title {
+    color: var(--secondary-color);
+    margin-bottom: 5px;
+}
+
+.login-subtitle {
+    color: #6c757d;
+    margin-bottom: 25px;
+    font-size: 0.95em;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
 }
 
 .error-message {
-    color: var(--secondary-color);
+    color: var(--danger-color);
     font-size: 0.9em;
     margin-top: 10px;
 }
@@ -103,7 +133,7 @@ button:hover {
 /* --- Tela Principal --- */
 #main-screen {
     width: 90%;
-    max-width: 900px;
+    max-width: 1200px; /* Aumentado para acomodar o grid */
     background: var(--card-background);
     padding: 30px;
     border-radius: 12px;
@@ -114,7 +144,7 @@ header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 3px solid var(--primary-color); /* Linha divisória de destaque */
+    border-bottom: 3px solid var(--primary-color);
     padding-bottom: 15px;
     margin-bottom: 30px;
 }
@@ -124,14 +154,8 @@ header {
     margin-bottom: 30px;
     padding: 20px;
     border-radius: 10px;
-    background-color: #f4f6f9; /* Fundo mais suave para a seção */
+    background-color: #e9f0f9; /* Azul claro para status */
     border-left: 5px solid var(--accent-color);
-}
-
-.status-box {
-    display: flex;
-    justify-content: space-around;
-    padding: 10px 0;
 }
 
 .status-box p {
@@ -144,11 +168,11 @@ header {
     color: var(--accent-color);
 }
 
-/* Barra de XP (Estilo mais limpo) */
+/* Barra de XP */
 .xp-bar-container {
-    height: 18px;
+    height: 20px;
     background-color: #e9ecef;
-    border-radius: 9px;
+    border-radius: 10px;
     overflow: hidden;
     margin: 10px 0;
 }
@@ -156,16 +180,25 @@ header {
 #xp-bar-fill {
     height: 100%;
     width: 0%;
-    background-color: var(--accent-color);
+    background-color: var(--secondary-color); /* Verde para XP */
     transition: width 0.5s ease-out;
-    border-radius: 9px 0 0 9px;
+    border-radius: 10px 0 0 10px;
+    /* Adicionando um leve gradiente para profundidade */
+    background-image: linear-gradient(45deg, var(--secondary-color), #34c759);
 }
 
-.xp-progress-text {
-    text-align: right;
-    font-size: 0.9em;
-    font-weight: 500;
-    color: #6c757d;
+/* Layout em Grid (Tarefas e Histórico) */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr; /* Tarefas maior que Histórico */
+    gap: 30px;
+}
+
+.grid-item {
+    padding: 20px;
+    border-radius: 10px;
+    background-color: #f4f7fa;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 /* Gerenciamento de Tarefas */
@@ -174,19 +207,16 @@ header {
     gap: 10px;
     margin-bottom: 25px;
     padding: 15px;
-    background-color: #f4f6f9;
+    background-color: #fff;
     border-radius: 8px;
-}
-
-.add-task input, .add-task select {
-    margin-bottom: 0;
+    border: 1px solid #eee;
 }
 
 .add-task input {
     flex-grow: 1;
 }
 
-#task-list {
+#task-list, #history-list {
     list-style: none;
     padding: 0;
 }
@@ -198,14 +228,10 @@ header {
     padding: 15px;
     margin-bottom: 10px;
     background-color: var(--card-background);
-    border: 1px solid #e9ecef;
+    border-left: 5px solid var(--primary-color);
     border-radius: 8px;
     box-shadow: var(--shadow-light);
     transition: box-shadow 0.3s;
-}
-
-#task-list li:hover {
-    box-shadow: var(--shadow-hover);
 }
 
 .task-info {
@@ -216,15 +242,54 @@ header {
 }
 
 .task-xp {
-    background-color: var(--primary-color);
-    color: white;
+    background-color: var(--accent-color);
+    color: var(--text-color);
     padding: 4px 10px;
     border-radius: 5px;
     font-size: 0.85em;
     font-weight: 700;
 }
 
-.task-actions button {
-    margin-left: 8px;
-    padding: 8px 12px;
+/* Estilo para Lista Vazia */
+.empty-list {
+    text-align: center;
+    color: #6c757d;
+    font-style: italic;
+    padding: 15px;
+    background-color: #fff;
+    border-radius: 8px;
+}
+
+/* --- Histórico de Conquistas (NOVO ESTILO) --- */
+#mission-history h3 {
+    color: var(--secondary-color);
+}
+
+.completed-task-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    margin-bottom: 8px;
+    background-color: #eafbea; /* Verde bem claro para tarefas concluídas */
+    border-left: 5px solid var(--secondary-color);
+    border-radius: 6px;
+    font-size: 0.9em;
+}
+
+.task-details {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.task-date {
+    color: #6c757d;
+    font-size: 0.8em;
+}
+
+@media (max-width: 992px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr; /* Em telas menores, volta para uma coluna */
+    }
 }
