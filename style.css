@@ -1,242 +1,225 @@
- @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');
-        
-        /* Variáveis de Tema */
-        :root {
-            --bg-dark: #1e1e2d; /* Fundo escuro do calabouço */
-            --card-bg: #2d384d; /* Cor da carta/painel */
-            --xp-color: #fcd34d; /* Ouro/Amarelo */
-            --text-light: #e0e0e0;
-            --highlight-green: #48bb78; /* Verde de sucesso/concluído */
-            --border-color: #6366f1; /* Roxo/Azul neon (Efeito Místico) */
-        }
+:root {
+    --primary-color: #4CAF50; /* Verde RPG */
+    --secondary-color: #388E3C;
+    --background-color: #f4f4f4;
+    --text-color: #333;
+    --bar-color: #2196F3; /* Azul XP */
+    --bar-bg: #ccc;
+}
 
-        body {
-            font-family: 'Cinzel', serif;
-            background-color: var(--bg-dark);
-            color: var(--text-light);
-            padding: 10px; 
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
 
-        .container {
-            width: 100%;
-            max-width: 1200px;
-        }
+/* Esconder elementos */
+.hidden {
+    display: none !important;
+}
 
-        /* Estilo da Placa Título */
-        header {
-            text-align: center;
-            margin-bottom: 20px; 
-        }
+/* --- Tela de Login --- */
+#login-screen {
+    background: #fff;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 300px;
+}
 
-        h1 {
-            font-size: 30px; 
-            font-weight: 700;
-            color: var(--xp-color);
-            border-bottom: 4px solid var(--border-color);
-            padding-bottom: 8px;
-            display: inline-block;
-            text-shadow: 0 0 10px rgba(252, 211, 77, 0.5);
-        }
+#email-input, #login-button {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 5px;
+}
 
-        /* Estilo Geral do Painel (Card RPG) */
-        .rpg-card {
-            background-color: var(--card-bg);
-            border: 2px solid var(--border-color);
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5), inset 0 0 8px rgba(99, 102, 241, 0.5);
-        }
-        
-        /* LOGIN SCREEN STYLES */
-        #login-screen {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 80vh;
-            width: 100%;
-            max-width: 400px;
-        }
+#email-input {
+    border: 1px solid #ddd;
+}
 
-        .login-card {
-            background-color: var(--card-bg);
-            border: 4px solid var(--xp-color);
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 0 20px rgba(252, 211, 77, 0.3);
-            width: 100%;
-        }
+#login-button {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
 
-        .login-card input {
-            width: 100%;
-            margin-bottom: 15px;
-            padding: 12px;
-            font-size: 16px;
-            border: 1px solid var(--border-color);
-        }
+#login-button:hover {
+    background-color: var(--secondary-color);
+}
 
-        .login-card button {
-            width: 100%;
-            margin-top: 10px;
-            padding: 12px;
-            font-size: 18px;
-        }
-        
-        /* Estilo da Barra de XP */
-        .xp-bar-container {
-            height: 25px;
-            background-color: #374151;
-            border: 2px solid var(--xp-color);
-            border-radius: 9999px;
-            overflow: hidden;
-            box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.7);
-            margin-top: 10px;
-        }
+.error-message {
+    color: red;
+    font-size: 0.9em;
+    margin-top: 10px;
+}
 
-        .xp-bar {
-            background: linear-gradient(90deg, #ca8a04, var(--xp-color));
-            height: 100%;
-            transition: width 0.7s ease-out;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            color: #1e1e2d;
-            font-weight: bold;
-        }
+/* --- Tela Principal --- */
+#main-screen {
+    width: 90%;
+    max-width: 800px;
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
 
-        /* Botões e Inputs */
-        .rpg-button {
-            background-color: #4a5568;
-            color: var(--text-light);
-            border: 1px solid var(--xp-color);
-            padding: 8px 15px;
-            border-radius: 4px;
-            transition: all 0.2s;
-            cursor: pointer;
-            font-family: 'Cinzel', serif;
-        }
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
 
-        .rpg-button:hover {
-            background-color: #6a7486;
-            box-shadow: 0 0 10px var(--highlight-green);
-        }
+#logout-button {
+    background-color: #f44336;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+}
 
-        input[type="text"], input[type="email"], input[type="password"] {
-            background-color: #1f2937;
-            border: 1px solid var(--border-color);
-            color: var(--text-light);
-            padding: 8px;
-            border-radius: 4px;
-            flex-grow: 1;
-        }
+/* Painel de Status */
+#rpg-status {
+    margin-bottom: 30px;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+}
 
-        /* Layout Responsivo */
-        main {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 20px;
-        }
+.status-box p {
+    font-size: 1.1em;
+    font-weight: bold;
+    margin: 5px 0;
+}
 
-        @media (min-width: 768px) {
-            body {
-                padding: 16px;
-            }
-            h1 {
-                font-size: 36px;
-            }
-            main {
-                grid-template-columns: 2fr 1fr;
-            }
-            #skill-tree-section {
-                grid-column: 1 / 3;
-            }
-        }
-        
-        /* Lista de Tarefas (Quests) - Estilos para mobile */
-        .task-item {
-            display: flex;
-            align-items: center;
-            padding: 10px 5px;
-            border-bottom: 1px dashed #4a5568;
-            transition: background-color 0.3s;
-        }
+/* Barra de XP (O Coração do RPG) */
+.xp-bar-container {
+    height: 25px;
+    background-color: var(--bar-bg);
+    border-radius: 12px;
+    overflow: hidden;
+    margin: 10px 0;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+}
 
-        .task-item.completed {
-            background-color: #1a365d; 
-            opacity: 0.7;
-            text-decoration: line-through;
-        }
+#xp-bar-fill {
+    height: 100%;
+    width: 0%; /* Controlado pelo JS */
+    background-color: var(--bar-color);
+    transition: width 0.5s ease-out;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 0.9em;
+    background-image: linear-gradient(
+        to right, 
+        rgba(255, 255, 255, 0.3) 0, 
+        rgba(255, 255, 255, 0.3) 25%, 
+        transparent 25%, 
+        transparent 50%, 
+        rgba(255, 255, 255, 0.3) 50%, 
+        rgba(255, 255, 255, 0.3) 75%, 
+        transparent 75%, 
+        transparent 100%
+    ); /* Efeito visual de barra de energia */
+    background-size: 20px 20px;
+}
 
-        .task-item .task-name {
-            flex-grow: 1;
-            margin-left: 10px;
-            font-size: 14px; 
-        }
+.xp-progress-text {
+    text-align: right;
+    font-size: 0.9em;
+}
 
-        .task-item .xp-reward {
-            color: var(--xp-color);
-            font-size: 0.8em; 
-            margin-right: 5px;
-            white-space: nowrap;
-        }
+/* Gerenciamento de Tarefas */
+.add-task {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
 
-        .remove-btn {
-            background-color: #e53e3e;
-            border: none;
-            padding: 4px 8px;
-            font-size: 10px;
-            line-height: 1;
-        }
-        
-        /* Estilo dos Nodes do Mapa Mental (Skill Tree) */
-        #skill-tree {
-            display: flex;
-            justify-content: center;
-            gap: 15px; 
-            flex-wrap: wrap;
-            padding-top: 15px;
-        }
+.add-task input, .add-task select {
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
 
-        .skill-node {
-            width: 45px; 
-            height: 45px; 
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 1em;
-            transition: all 0.3s;
-            box-sizing: border-box;
-            cursor: default;
-        }
+.add-task input {
+    flex-grow: 1;
+}
 
-        .skill-locked {
-            background-color: #4a5568;
-            border: 3px dashed #9ca3af;
-            color: #9ca3af;
-            opacity: 0.5;
-        }
+#add-task-button {
+    background-color: var(--secondary-color);
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+}
 
-        .skill-unlocked {
-            background-color: var(--highlight-green);
-            border: 4px solid var(--xp-color);
-            color: var(--bg-dark);
-            box-shadow: 0 0 12px var(--highlight-green), 0 0 20px rgba(72, 187, 119, 0.7);
-            animation: glow 1.5s infinite alternate;
-        }
+#task-list {
+    list-style: none;
+    padding: 0;
+}
 
-        @keyframes glow {
-            0% { transform: scale(1); }
-            100% { transform: scale(1.05); }
-        }
-        
-        #skill-tree > div[style*="font-size: 30px"] {
-             font-size: 20px !important; 
-        }
+#task-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    margin-bottom: 8px;
+    background-color: #fff;
+    border: 1px solid #eee;
+    border-radius: 5px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.task-info {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.task-xp {
+    background-color: gold;
+    color: #333;
+    padding: 4px 8px;
+    border-radius: 3px;
+    font-size: 0.8em;
+    font-weight: bold;
+}
+
+.task-actions button {
+    margin-left: 10px;
+    padding: 6px 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.complete-btn {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.remove-btn {
+    background-color: #f44336;
+    color: white;
+}
